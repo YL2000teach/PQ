@@ -1,0 +1,561 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Power Query | תרגיל היכרות</title>
+<style>
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    font-family:Arial,"Noto Sans Hebrew",sans-serif;
+    background:#0b0d10;
+    color:#1f2937;
+    line-height:1.7;
+  }
+  .page{
+    min-height:100vh;
+    background:
+      linear-gradient(rgba(5,8,12,.76),rgba(5,8,12,.88)),
+      radial-gradient(circle at 20% 0%,rgba(43,108,176,.18),transparent 35%),
+      #0b0d10;
+    padding-bottom:60px;
+  }
+  .hero{
+    padding:54px 24px 34px;
+    text-align:center;
+    color:#fff;
+  }
+  .kicker{
+    font-size:.9rem;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:#7fb3ff;
+    font-weight:700;
+  }
+  h1{
+    margin:8px 0 4px;
+    font-size:clamp(2.2rem,5vw,4.5rem);
+    line-height:1.05;
+    letter-spacing:.02em;
+    font-weight:800;
+  }
+  .rule{
+    width:min(580px,80%);
+    height:4px;
+    margin:22px auto 16px;
+    background:linear-gradient(90deg,#2f6fed,#73a7ff);
+  }
+  .subtitle{
+    color:#d3d9e3;
+    font-size:clamp(1rem,2vw,1.35rem);
+  }
+  .shell{
+    width:min(1160px,calc(100% - 32px));
+    margin:0 auto;
+  }
+  .overview{
+    background:#fff;
+    border-radius:20px;
+    padding:24px 26px;
+    margin-bottom:18px;
+    border-top:6px solid #2f6fed;
+    box-shadow:0 18px 50px rgba(0,0,0,.32);
+  }
+  .overview-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
+    margin-top:14px;
+  }
+  .overview-item{
+    background:#f7f9fc;
+    border:1px solid #e5eaf1;
+    border-radius:12px;
+    padding:12px 14px;
+  }
+  .nav{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin:0 0 18px;
+    justify-content:center;
+  }
+  .nav a{
+    color:#fff;
+    text-decoration:none;
+    border:1px solid rgba(255,255,255,.22);
+    background:rgba(255,255,255,.08);
+    border-radius:999px;
+    padding:7px 12px;
+    font-size:.92rem;
+  }
+  .panel{
+    background:#fff;
+    border-radius:20px;
+    margin:18px 0;
+    padding:30px 34px;
+    box-shadow:0 18px 50px rgba(0,0,0,.28);
+    border-top:6px solid #2f6fed;
+  }
+  .panel-title{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    border-bottom:1px solid #e8ecf2;
+    padding-bottom:16px;
+    margin-bottom:8px;
+  }
+  .panel-title h2{
+    margin:0;
+    font-size:1.9rem;
+    line-height:1.2;
+  }
+  .section-chip{
+    background:#111827;
+    color:#fff;
+    border-radius:10px;
+    min-width:44px;
+    height:44px;
+    display:grid;
+    place-items:center;
+    font-weight:800;
+  }
+  .task{
+    display:grid;
+    grid-template-columns:1fr 48px;
+    gap:18px;
+    padding:22px 0;
+    border-bottom:1px solid #edf0f4;
+  }
+  .task:last-child{border-bottom:none}
+  .task-num{
+    background:#111;
+    color:#f8cc20;
+    width:40px;
+    height:40px;
+    display:grid;
+    place-items:center;
+    border-radius:5px;
+    font-weight:800;
+    font-size:1.08rem;
+    margin-top:3px;
+  }
+  .task h3{
+    margin:0 0 7px;
+    color:#c74430;
+    font-size:1.22rem;
+  }
+  .task p{margin:.35rem 0}
+  .path{
+    display:inline-block;
+    direction:ltr;
+    text-align:left;
+    margin:7px 0;
+    padding:5px 9px;
+    background:#f3f5f8;
+    border:1px solid #dde3ea;
+    border-radius:7px;
+    font-family:Consolas,monospace;
+    font-size:.9rem;
+  }
+  .question{
+    margin-top:12px;
+    padding:12px 14px;
+    background:#eef8f2;
+    border-right:4px solid #198754;
+    border-radius:9px;
+  }
+  .question b{color:#157347}
+  .tip{
+    margin-top:12px;
+    padding:11px 13px;
+    background:#fff6df;
+    border-right:4px solid #e0a11a;
+    border-radius:9px;
+  }
+  .note{
+    margin-top:12px;
+    padding:11px 13px;
+    background:#edf4ff;
+    border-right:4px solid #2f6fed;
+    border-radius:9px;
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin:12px 0;
+    background:#fff;
+  }
+  th,td{
+    border:1px solid #dfe5ec;
+    padding:9px 10px;
+    text-align:right;
+  }
+  th{background:#f3f6fa}
+  ul,ol{margin:.45rem 0;padding-right:1.4rem}
+  .submit{
+    background:#fff;
+    border-radius:20px;
+    padding:28px 34px;
+    margin-top:18px;
+    border-top:6px solid #198754;
+    box-shadow:0 18px 50px rgba(0,0,0,.28);
+  }
+  .submit-placeholder{
+    border:2px dashed #b9c4d2;
+    background:#f9fbfd;
+    border-radius:14px;
+    min-height:220px;
+    display:grid;
+    place-items:center;
+    text-align:center;
+    color:#667085;
+    margin-top:14px;
+    padding:24px;
+  }
+  iframe{width:100%;min-height:1050px;border:0;border-radius:12px}
+  .footer{
+    color:#aeb7c4;
+    text-align:center;
+    font-size:.88rem;
+    padding-top:24px;
+  }
+  @media(max-width:760px){
+    .overview-grid{grid-template-columns:1fr}
+    .panel{padding:24px 18px}
+    .task{grid-template-columns:1fr 42px;gap:10px}
+    .panel-title h2{font-size:1.45rem}
+    .hero{padding-top:38px}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="hero">
+    <div class="kicker">POWER BI · POWER QUERY</div>
+    <h1>POWER QUERY</h1>
+    <div class="rule"></div>
+    <div class="subtitle">תרגיל היכרות מודרך | חברת הגיימינג "משחקי אתגר"</div>
+  </header>
+
+  <main class="shell">
+    <section class="overview">
+      <h2 style="margin:0">לפני שמתחילים</h2>
+      <p>בתרגיל תטענו קובץ אקסל, תבדקו את איכות הנתונים, תבצעו פעולות ניקוי וטיוב ותיצרו מידע חדש באמצעות Power Query.</p>
+      <div class="overview-grid">
+        <div class="overview-item"><b>קובץ:</b><br>נתוני שכר</div>
+        <div class="overview-item"><b>גיליון לטעינה:</b><br>מקור</div>
+        <div class="overview-item"><b>הגשה:</b><br>PBIX + תשובות בטופס</div>
+      </div>
+    </section>
+
+    <nav class="nav">
+      <a href="#a">טעינה והיכרות</a>
+      <a href="#b">איכות וניקוי</a>
+      <a href="#c">תאריך וטקסט</a>
+      <a href="#d">עמודות וחישובים</a>
+      <a href="#e">Applied Steps</a>
+      <a href="#submit">הגשת תשובות</a>
+    </nav>
+
+    <section class="panel" id="a">
+      <div class="panel-title">
+        <h2>חלק א · טעינה והיכרות עם הנתונים</h2>
+        <div class="section-chip">א</div>
+      </div>
+
+      <div class="task">
+        <div>
+          <h3>פתיחת פרויקט</h3>
+          <p>פתחו את Power BI ובחרו <b>Blank Report</b>.</p>
+        </div>
+        <div class="task-num">1</div>
+      </div>
+
+      <div class="task">
+        <div>
+          <h3>טעינת קובץ האקסל</h3>
+          <p>התחברו לקובץ <b>"נתוני שכר"</b> ופתחו אותו ב־Power Query.</p>
+          <div class="path">Home → Get data → Excel workbook → Transform data</div>
+          <p>בטעינה בחרו <b>רק</b> את הגיליון בשם <b>מקור</b>.</p>
+        </div>
+        <div class="task-num">2</div>
+      </div>
+
+      <div class="task">
+        <div>
+          <h3>בדיקת סוגי הנתונים</h3>
+          <p>עברו על העמודות. אם סוג הנתון אינו מתאים לתוכן העמודה — שנו אותו.</p>
+          <table>
+            <thead><tr><th>עמודה</th><th>תיאור</th><th>סוג</th></tr></thead>
+            <tbody>
+              <tr><td>Gender</td><td>מין</td><td>טקסט</td></tr>
+              <tr><td>Age</td><td>גיל</td><td>מספר שלם</td></tr>
+              <tr><td>PerfEval</td><td>ציון הערכת ביצועים</td><td>מספר שלם</td></tr>
+              <tr><td>Education</td><td>השכלה</td><td>טקסט</td></tr>
+              <tr><td>Dept Name</td><td>שם מחלקה</td><td>טקסט</td></tr>
+              <tr><td>Hire Date</td><td>תאריך גיוס</td><td>תאריך</td></tr>
+              <tr><td>JobTitle</td><td>תפקיד</td><td>טקסט</td></tr>
+              <tr><td>Seniority</td><td>ותק</td><td>מספר שלם</td></tr>
+              <tr><td>BasePay</td><td>שכר בסיס</td><td>מטבע / מספר עשרוני</td></tr>
+              <tr><td>Bonus</td><td>בונוס</td><td>מטבע / מספר עשרוני</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="task-num">3</div>
+      </div>
+    </section>
+
+    <section class="panel" id="b">
+      <div class="panel-title">
+        <h2>חלק ב · איכות וניקוי נתונים</h2>
+        <div class="section-chip">ב</div>
+      </div>
+
+      <div class="task">
+        <div>
+          <h3>Column Quality</h3>
+          <div class="path">View → Column quality</div>
+          <p>בדקו באילו עמודות קיימים ערכים ריקים או שגויים.</p>
+          <div class="question"><b>שאלה 1:</b> באיזו עמודה קיימים ערכים ריקים, וכמה?</div>
+          <p>הסירו את הרשומות שבהן ערך השכר חסר.</p>
+        </div>
+        <div class="task-num">4</div>
+      </div>
+
+      <div class="task">
+        <div>
+          <h3>Column Profile</h3>
+          <div class="path">View → Column profile</div>
+          <div class="question"><b>שאלה 2:</b> מהו ממוצע הגילאים בחברה?</div>
+          <div class="question"><b>שאלה 3:</b> מהו שכר הבסיס המקסימלי?</div>
+          <div class="tip"><b>שימו לב:</b> ודאו שהפרופיל מבוסס על כל מערך הנתונים ולא רק על 1,000 השורות הראשונות.</div>
+        </div>
+        <div class="task-num">5</div>
+      </div>
+
+      <div class="task">
+        <div>
+          <h3>תיקון Gender</h3>
+          <p>בחברה אמורים להופיע רק הערכים <b>Male</b> ו־<b>Female</b>.</p>
+          <div class="question"><b>שאלה 4:</b> כמה ערכים שונים קיימים כרגע בעמודה Gender ומהו הערך שאינו תקין?</div>
+          <p>תקנו את שגיאת הכתיב:</p>
+          <div class="path">Transform → Replace Values</div>
+        </div>
+        <div class="task-num">6</div>
+      </div>
+
+      <div class="task">
+        <div>
+          <h3>בדיקת גילאים לא תקינים</h3>
+          <p>בחברה עובדים רק מגיל 18 ומעלה.</p>
+          <div class="question"><b>שאלה 5:</b> כמה עובדים מופיעים עם גיל קטן מ־18?</div>
+          <p>תקנו את הנתונים כך שכל גיל קטן מ־18 יקבל את הערך 18.</p>
+          <div class="note"><b>חשבו:</b> האם Replace Values מתאים לתנאי של "כל ערך קטן מ־18"?</div>
+        </div>
+        <div class="task-num">7</div>
+      </div>
+
+      <div class="task">
+        <div>
+          <h3>בדיקת PerfEval</h3>
+          <p>ציון הערכת ביצועים תקין צריך להיות בין 1 ל־5.</p>
+          <div class="question"><b>שאלה 6:</b> האם קיימים ערכים מחוץ לטווח? אילו וכמה?</div>
+          <p>אין צורך לתקן אותם בשלב זה.</p>
+        </div>
+        <div class="task-num">8</div>
+      </div>
+    </section>
+
+    <section class="panel" id="c">
+      <div class="panel-title">
+        <h2>חלק ג · תאריך וטקסט</h2>
+        <div class="section-chip">ג</div>
+      </div>
+
+      <div class="task">
+        <div>
+          <h3>שנה וחודש מתוך Hire Date</h3>
+          <p>הוסיפו עמודת שנת גיוס ועמודת חודש גיוס.</p>
+          <div class="path">Add Column → Date → Year</div><br>
+          <div class="path">Add Column → Date → Month</div>
+        </div>
+        <div class="task-num">9</div>
+      </div>
+
+      <div class="task">
+        <div>
+          <h3>Education באותיות גדולות</h3>
+          <div class="path">Transform → Format → UPPERCASE</div>
+          <p>הסתכלו בחלונית <b>Applied Steps</b> וזהו את השלב שנוסף. לאחר מכן מחקו רק אותו.</p>
+          <div class="question"><b>שאלה 7:</b> מה קרה לפעולות שביצעתם לפני השלב שמחקתם?</div>
+        </div>
+        <div class="task-num">10</div>
+      </div>
+
+      <div class="task">
+        <div>
+          <h3>Transform לעומת Add Column</h3>
+          <p>צרו עותק של Education והפכו את העותק לאותיות גדולות, כך שגם המקור וגם העמודה החדשה יישארו.</p>
+          <div class="question"><b>שאלה 8:</b> מה ההבדל בין Transform לבין Add Column מבחינת התוצאה?</div>
+        </div>
+        <div class="task-num">11</div>
+      </div>
+    </section>
+
+    <section class="panel" id="d">
+      <div class="panel-title">
+        <h2>חלק ד · עמודות חדשות וחישובים</h2>
+        <div class="section-chip">ד</div>
+      </div>
+
+      <div class="task">
+        <div>
+          <h3>Gender &amp; Age</h3>
+          <p>צרו עמודה חדשה שמכילה Gender, רווח, ולאחריו Age. תנו לה את השם <b>Gender &amp; Age</b>.</p>
+          <div class="tip">בחרו דרך שמשאירה את Gender ואת Age המקוריות בטבלה.</div>
+        </div>
+        <div class="task-num">12</div>
+      </div>
+
+      <div class="task">
+        <div>
+          <h3>עדכון שכר בסיס</h3>
+          <p>הוסיפו 1,000 לכל ערך בעמודת BasePay.</p>
+          <div class="path">Transform → Standard → Add</div>
+        </div>
+        <div class="task-num">13</div>
+      </div>
+
+      <div class="task">
+        <div>
+          <h3>Total</h3>
+          <p>צרו עמודה חדשה: <b>Total = BasePay + Bonus</b>.</p>
+          <div class="path">Add Column → Custom Column</div>
+          <ul>
+            <li>שם: Total</li>
+            <li>מקמו אחרי Bonus</li>
+            <li>הגדירו סוג נתון מתאים לשכר</li>
+          </ul>
+          <div class="question"><b>שאלה 9:</b> מהו הערך המינימלי בעמודת Total?</div>
+        </div>
+        <div class="task-num">14</div>
+      </div>
+
+      <div class="task">
+        <div>
+          <h3>NewPay</h3>
+          <p>צרו עמודה חדשה הכוללת תוספת של 5% לשכר הבסיס.</p>
+          <p>שם העמודה: <b>NewPay</b></p>
+          <div class="question"><b>שאלה 10:</b> מהו השכר הממוצע בעמודת NewPay?</div>
+        </div>
+        <div class="task-num">15</div>
+      </div>
+
+      <div class="task">
+        <div>
+          <h3>JobType</h3>
+          <p>צרו עמודה חדשה המכילה את החלק הראשון של JobTitle עד הרווח הראשון.</p>
+          <div class="path">Add Column → Extract → Text Before Delimiter</div>
+        </div>
+        <div class="task-num">16</div>
+      </div>
+
+      <div class="task">
+        <div>
+          <h3>Split Column</h3>
+          <p>פצלו את JobTitle לפי הרווח הראשון לשתי עמודות.</p>
+          <div class="path">Transform / Home → Split Column → By Delimiter</div>
+        </div>
+        <div class="task-num">17</div>
+      </div>
+
+      <div class="task">
+        <div>
+          <h3>אורך Dept Name</h3>
+          <p>צרו עמודה חדשה שמחשבת את מספר התווים בשם המחלקה.</p>
+          <div class="path">Add Column → Extract → Length</div>
+          <div class="question"><b>שאלה 11:</b> מהו אורך הטקסט הקטן ביותר?</div>
+        </div>
+        <div class="task-num">18</div>
+      </div>
+
+      <div class="task">
+        <div>
+          <h3>Conditional Column – קבוצות גיל</h3>
+          <div class="path">Add Column → Conditional Column</div>
+          <table>
+            <thead><tr><th>גיל</th><th>קבוצה</th></tr></thead>
+            <tbody>
+              <tr><td>עד 22 כולל</td><td>צעירים</td></tr>
+              <tr><td>23–35</td><td>צעירים +</td></tr>
+              <tr><td>36–45</td><td>מבוגרים</td></tr>
+              <tr><td>46 ומעלה</td><td>ותיקים</td></tr>
+            </tbody>
+          </table>
+          <div class="question"><b>שאלה 12:</b> כמה עובדים נמצאים בקבוצת "ותיקים"?</div>
+        </div>
+        <div class="task-num">19</div>
+      </div>
+    </section>
+
+    <section class="panel" id="e">
+      <div class="panel-title">
+        <h2>חלק ה · Applied Steps והבנת התהליך</h2>
+        <div class="section-chip">ה</div>
+      </div>
+
+      <div class="task">
+        <div>
+          <h3>הסתכלו על כל התהליך</h3>
+          <p>עברו על רשימת <b>Applied Steps</b> מההתחלה ועד הסוף.</p>
+          <div class="question"><b>שאלה 13:</b> בחרו שלב אחד שהוא דוגמה לניקוי/טיוב ושלב אחד שהוא דוגמה ליצירת מידע חדש. הסבירו בקצרה.</div>
+          <div class="question"><b>שאלה 14:</b> אם קובץ המקור יוחלף בקובץ חדש בעל אותו מבנה, האם יהיה צורך לבצע שוב ידנית את כל הפעולות? הסבירו.</div>
+        </div>
+        <div class="task-num">20</div>
+      </div>
+
+      <div class="task">
+        <div>
+          <h3>סיום ושמירה</h3>
+          <div class="path">Home → Close & Apply</div>
+          <p>שמרו את הפרויקט והעלו את קובץ ה־PBIX ל־Classroom.</p>
+        </div>
+        <div class="task-num">21</div>
+      </div>
+    </section>
+
+    <section class="submit" id="submit">
+      <h2 style="margin-top:0">הגשת התשובות</h2>
+      <p>כאן ניתן להטמיע Google Form עם שאלות 1–14.</p>
+
+      <div id="form-placeholder" class="submit-placeholder">
+        <div>
+          <b>Google Form יופיע כאן</b>
+          <p>הדביקי בקוד את כתובת ה־Embed של הטופס.</p>
+        </div>
+      </div>
+      <iframe id="google-form" title="טופס תשובות" style="display:none"></iframe>
+    </section>
+
+    <div class="footer">Power Query · תרגיל היכרות · משחקי אתגר</div>
+  </main>
+</div>
+
+<script>
+  // הדביקי כאן את כתובת ה-src של ה-Google Form המוטמע
+  const GOOGLE_FORM_EMBED_URL = "GOOGLE_FORM_EMBED_URL";
+
+  if (GOOGLE_FORM_EMBED_URL !== "GOOGLE_FORM_EMBED_URL") {
+    const iframe = document.getElementById("google-form");
+    const placeholder = document.getElementById("form-placeholder");
+    iframe.src = GOOGLE_FORM_EMBED_URL;
+    iframe.style.display = "block";
+    placeholder.style.display = "none";
+  }
+</script>
+</body>
+</html>
